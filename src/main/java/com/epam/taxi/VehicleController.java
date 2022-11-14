@@ -1,6 +1,6 @@
 package com.epam.taxi;
 
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,14 +10,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/v1/vehicles")
 public class VehicleController {
 
-    private KafkaTemplate<String, Vehicle> kafkaTemplate;
+    private VehicleInputProducer vehicleInputProducer;
 
-    public VehicleController(KafkaTemplate<String, Vehicle> kafkaTemplate) {
-        this.kafkaTemplate = kafkaTemplate;
+    @Value("${kafka.input.topic}")
+    private String topic;
+
+    public VehicleController(VehicleInputProducer vehicleInputProducer) {
+        this.vehicleInputProducer = vehicleInputProducer;
     }
 
     @PostMapping
     public void submit(@RequestBody Vehicle vehicle) {
-        kafkaTemplate.send("input", vehicle);
+        vehicleInputProducer.send(topic, vehicle);
     }
 }
