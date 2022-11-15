@@ -1,4 +1,4 @@
-package com.epam.taxi.listener;
+package com.epam.taxi.consumer;
 
 import com.epam.taxi.entity.Vehicle;
 import com.epam.taxi.producer.VehicleInputProducer;
@@ -9,7 +9,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 @Component
-public class KafkaOutputListeners {
+public class KafkaOutputConsumer {
 
     private static final Logger LOG = LoggerFactory.getLogger(VehicleInputProducer.class.getName());
 

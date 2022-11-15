@@ -1,4 +1,4 @@
-package com.epam.taxi.listener;
+package com.epam.taxi.consumer;
 
 import com.epam.taxi.entity.Vehicle;
 import com.epam.taxi.producer.VehicleInputProducer;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 @Component
-public class KafkaInputListeners {
+public class KafkaInputConsumer {
 
     private static final Logger LOG = LoggerFactory.getLogger(VehicleInputProducer.class.getName());
 
@@ -25,12 +25,12 @@ public class KafkaInputListeners {
     @Value("${kafka.output.topic}")
     private String outputTopic;
 
-    public KafkaInputListeners(VehicleStorage vehicleStorage, VehicleOutputProducer vehicleOutputProducer) {
+    public KafkaInputConsumer(VehicleStorage vehicleStorage, VehicleOutputProducer vehicleOutputProducer) {
         this.vehicleStorage = vehicleStorage;
         this.vehicleOutputProducer = vehicleOutputProducer;
     }
 
-    @KafkaListener(topics = "${kafka.input.topic}", groupId = "${kafka.group.id}")
+    @KafkaListener(topics = "${kafka.input.topic}", groupId = "${kafka.group.id}", concurrency = "3")
     void listener(@Payload Vehicle vehicle) {
         vehicle.setDistance(Objects.nonNull(vehicleStorage.get(vehicle.getId())) ?
                     VehicleUtil.distance(vehicleStorage.get(vehicle.getId()), vehicle) : 0);

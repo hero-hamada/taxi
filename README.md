@@ -1,4 +1,4 @@
-#Apache Kafka
+# Apache Kafka
 
 ## Prerequisites:
 Configure a Kafka cluster using Docker with the following parameters: * Number of brokers - 3 * Number of partitions - 3 * Replication factor - 2
