@@ -1,10 +1,11 @@
-package com.epam.taxi;
+package com.epam.taxi.entity;
 
 import lombok.Data;
 
 @Data
 public class Vehicle {
-    private Long id;
+    private String id;
     private Double x;
     private Double y;
+    private Double distance;
 }

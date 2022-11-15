@@ -1,6 +1,6 @@
 package com.epam.taxi.config;
 
-import com.epam.taxi.Vehicle;
+import com.epam.taxi.entity.Vehicle;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;

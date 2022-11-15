@@ -18,12 +18,14 @@ public class KafkaTopicConfig {
     @Bean
     public NewTopic inputTopic() {
         return TopicBuilder.name(input)
+                .partitions(5)
                 .build();
     }
 
     @Bean
     public NewTopic outputTopic() {
         return TopicBuilder.name(output)
+                .partitions(5)
                 .build();
     }
 }
