@@ -1,5 +1,6 @@
 package com.epam.taxi.config;
 
+import com.epam.taxi.entity.VehicleDistance;
 import com.epam.taxi.entity.VehicleSignal;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -36,12 +37,22 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public ProducerFactory<String, VehicleSignal> producerFactory() {
+    public ProducerFactory<String, VehicleSignal> inputProducerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfig());
     }
 
     @Bean
-    public KafkaTemplate<String, VehicleSignal> kafkaTemplate(ProducerFactory<String, VehicleSignal> producerFactory) {
+    public KafkaTemplate<String, VehicleSignal> kafkaInputTemplate(ProducerFactory<String, VehicleSignal> producerFactory) {
+        return new KafkaTemplate<>(producerFactory);
+    }
+
+    @Bean
+    public ProducerFactory<String, VehicleDistance> outputProducerFactory() {
+        return new DefaultKafkaProducerFactory<>(producerConfig());
+    }
+
+    @Bean
+    public KafkaTemplate<String, VehicleDistance> kafkaOutputTemplate(ProducerFactory<String, VehicleDistance> producerFactory) {
         return new KafkaTemplate<>(producerFactory);
     }
 }

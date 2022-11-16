@@ -1,6 +1,6 @@
 package com.epam.taxi.consumer;
 
-import com.epam.taxi.entity.VehicleSignal;
+import com.epam.taxi.entity.VehicleDistance;
 import com.epam.taxi.producer.VehicleInputProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,15 +12,15 @@ import org.springframework.stereotype.Component;
 public class KafkaOutputConsumer {
 
     private static final Logger LOG = LoggerFactory.getLogger(VehicleInputProducer.class.getName());
-    private VehicleSignal vehiclePayload;
+    private VehicleDistance vehiclePayload;
 
     @KafkaListener(topics = "${kafka.output.topic}", groupId = "${kafka.group.id}")
-    public void listener(@Payload VehicleSignal vehicle) {
-        vehiclePayload = vehicle;
-        LOG.info("Vehicle with id {} passed distance {}", vehicle.getId(), vehicle.getDistance());
+    public void listener(@Payload VehicleDistance vehicleDistance) {
+        vehiclePayload = vehicleDistance;
+        LOG.info("Vehicle with id {} passed distance {}", vehicleDistance.getId(), vehicleDistance.getDistance());
     }
 
-    public VehicleSignal getVehiclePayload() {
+    public VehicleDistance getVehiclePayload() {
         return vehiclePayload;
     }
 }

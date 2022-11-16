@@ -1,5 +1,6 @@
 package com.epam.taxi.config;
 
+import com.epam.taxi.entity.VehicleDistance;
 import com.epam.taxi.entity.VehicleSignal;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -34,16 +35,31 @@ public class KafkaConsumerConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, VehicleSignal> consumerFactory() {
+    public ConsumerFactory<String, VehicleSignal> inputConsumerFactory() {
         return new DefaultKafkaConsumerFactory<>(consumerConfig());
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, VehicleSignal>> factory(
-            ConsumerFactory<String, VehicleSignal> consumerFactory
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, VehicleSignal>> inputFactory(
+            ConsumerFactory<String, VehicleSignal> inputConsumerFactory
     ) {
         ConcurrentKafkaListenerContainerFactory<String, VehicleSignal> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactory);
+        factory.setConsumerFactory(inputConsumerFactory);
+        factory.setBatchListener(true);
+        return factory;
+    }
+
+    @Bean
+    public ConsumerFactory<String, VehicleDistance> outputConsumerFactory() {
+        return new DefaultKafkaConsumerFactory<>(consumerConfig());
+    }
+
+    @Bean
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, VehicleDistance>> outputFactory(
+            ConsumerFactory<String, VehicleDistance> outputConsumerFactory
+    ) {
+        ConcurrentKafkaListenerContainerFactory<String, VehicleDistance> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(outputConsumerFactory);
         factory.setBatchListener(true);
         return factory;
     }

@@ -27,6 +27,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -38,14 +39,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.Mockito.verify;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class, classes = com.epam.taxi.KafkaTestContainersLiveTest.KafkaTestContainersConfiguration.class)
-//@Import(com.epam.taxi.KafkaTestContainersLiveTest.KafkaTestContainersConfiguration.class)
 @SpringBootTest(classes = TaxiApplication.class)
 @TestPropertySource(locations="classpath:application.properties")
-//@DirtiesContext
+@DirtiesContext
 public class KafkaTestContainersLiveTest {
 
     @ClassRule
@@ -53,9 +52,6 @@ public class KafkaTestContainersLiveTest {
 
     @Value("${kafka.input.topic}")
     private String inputTopic;
-
-    @Value("${kafka.output.topic}")
-    private String outputTopic;
 
     @Autowired
     private KafkaInputConsumer kafkaInputConsumer;
@@ -69,49 +65,50 @@ public class KafkaTestContainersLiveTest {
     @Autowired
     private VehicleStorage vehicleStorage;
 
-    @Autowired
-    private VehicleOutputProducer vehicleOutputProducer;
-
     private VehicleSignal vehicle;
 
     @Test
-    public void givenKafkaDockerContainer_whenSendingFirstTimeVehicleProducer_thenVehicleStored() throws InterruptedException {
+    public void givenKafkaDockerContainer_whenSendingFirstTimeVehicleProducer_thenCorrectVehicleDistance() throws InterruptedException {
         // given
         vehicle = new VehicleSignal();
-        vehicle.setId("XYZ7789");
+        vehicle.setId("XYZ7710469");
         vehicle.setX(0.0);
         vehicle.setY(100.0);
-        vehicle.setDistance(0.0);
 
+        // when
         vehicleInputProducer.send(inputTopic, vehicle);
+
+        // then
+        Thread.sleep(2000);
+        assertThat(kafkaInputConsumer.getVehiclePayload())
+                .as("Input consumer payload is not equal to passed one")
+                .isEqualTo(vehicle);
+        assertThat(vehicleStorage.get(vehicle.getId()))
+                .as("Vehicle isn't stored correctly")
+                .isEqualTo(vehicle);
         Thread.sleep(1000);
-        assertThat(kafkaInputConsumer.getVehiclePayload()).isEqualTo(vehicle);
-        assertThat(vehicleStorage.get(vehicle.getId())).isEqualTo(vehicle);
-        Thread.sleep(1000);
-        assertThat(kafkaOutputConsumer.getVehiclePayload().getDistance()).isEqualTo(0.0);
+        assertThat(kafkaOutputConsumer.getVehiclePayload().getDistance())
+                .as("Vehicle isn't stored correctly")
+                .isEqualTo(0.0);
     }
 
     @Test
-    public void givenKafkaDockerContainer_whenSendingSecondTimeVehicleProducer_thenVehicleStored() throws InterruptedException {
+    public void givenKafkaDockerContainer_whenSendingSecondTimeVehicleProducer_thenCorrectVehicleDistance() throws InterruptedException {
         // given
         vehicle = new VehicleSignal();
-        vehicle.setId("XYZ7789");
+        vehicle.setId("XYZ7779874");
         vehicle.setX(0.0);
         vehicle.setY(100.0);
-        vehicle.setDistance(0.0);
 
         vehicleInputProducer.send(inputTopic, vehicle);
-
-        Thread.sleep(1000);
-
         vehicle.setX(100.0);
 
         // when
         vehicleInputProducer.send(inputTopic, vehicle);
 
-        Thread.sleep(1000);
+        // then
+        Thread.sleep(2000);
         assertThat(kafkaInputConsumer.getVehiclePayload()).isEqualTo(vehicle);
-        vehicle.setDistance(100.0);
         assertThat(vehicleStorage.get(vehicle.getId())).isEqualTo(vehicle);
         Thread.sleep(1000);
         assertThat(kafkaOutputConsumer.getVehiclePayload().getDistance()).isEqualTo(100.0);
