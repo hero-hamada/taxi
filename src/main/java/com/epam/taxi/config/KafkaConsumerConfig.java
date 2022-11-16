@@ -1,6 +1,6 @@
 package com.epam.taxi.config;
 
-import com.epam.taxi.entity.Vehicle;
+import com.epam.taxi.entity.VehicleSignal;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,24 +21,28 @@ public class KafkaConsumerConfig {
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
+    @Bean
     public Map<String, Object> consumerConfig() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        //  "at most once" consumer
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
+        props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, 100);
         return props;
     }
 
     @Bean
-    public ConsumerFactory<String, Vehicle> consumerFactory() {
+    public ConsumerFactory<String, VehicleSignal> consumerFactory() {
         return new DefaultKafkaConsumerFactory<>(consumerConfig());
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Vehicle>> factory(
-            ConsumerFactory<String, Vehicle> consumerFactory
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, VehicleSignal>> factory(
+            ConsumerFactory<String, VehicleSignal> consumerFactory
     ) {
-        ConcurrentKafkaListenerContainerFactory<String, Vehicle> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        ConcurrentKafkaListenerContainerFactory<String, VehicleSignal> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
         factory.setBatchListener(true);
         return factory;

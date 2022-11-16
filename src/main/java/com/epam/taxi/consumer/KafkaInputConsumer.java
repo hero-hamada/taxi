@@ -1,6 +1,6 @@
 package com.epam.taxi.consumer;
 
-import com.epam.taxi.entity.Vehicle;
+import com.epam.taxi.entity.VehicleSignal;
 import com.epam.taxi.producer.VehicleInputProducer;
 import com.epam.taxi.producer.VehicleOutputProducer;
 import com.epam.taxi.storage.VehicleStorage;
@@ -21,6 +21,7 @@ public class KafkaInputConsumer {
 
     private final VehicleStorage vehicleStorage;
     private final VehicleOutputProducer vehicleOutputProducer;
+    private VehicleSignal vehiclePayload;
 
     @Value("${kafka.output.topic}")
     private String outputTopic;
@@ -31,11 +32,16 @@ public class KafkaInputConsumer {
     }
 
     @KafkaListener(topics = "${kafka.input.topic}", groupId = "${kafka.group.id}", concurrency = "3")
-    void listener(@Payload Vehicle vehicle) {
+    public void listener(@Payload VehicleSignal vehicle) {
+        vehiclePayload = vehicle;
         vehicle.setDistance(Objects.nonNull(vehicleStorage.get(vehicle.getId())) ?
                     VehicleUtil.distance(vehicleStorage.get(vehicle.getId()), vehicle) : 0);
         vehicleOutputProducer.send(outputTopic, vehicle);
         vehicleStorage.save(vehicle);
         LOG.info("Vehicle {} saved", vehicle);
+    }
+
+    public VehicleSignal getVehiclePayload() {
+        return vehiclePayload;
     }
 }

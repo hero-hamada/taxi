@@ -1,6 +1,6 @@
 package com.epam.taxi.controller;
 
-import com.epam.taxi.entity.Vehicle;
+import com.epam.taxi.entity.VehicleSignal;
 import com.epam.taxi.producer.VehicleInputProducer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,7 +22,7 @@ public class VehicleController {
     }
 
     @PostMapping
-    public void submit(@RequestBody Vehicle vehicle) {
+    public void submit(@RequestBody VehicleSignal vehicle) {
         vehicleInputProducer.send(inputTopic, vehicle);
     }
 }

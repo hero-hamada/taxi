@@ -1,6 +1,6 @@
 package com.epam.taxi.producer;
 
-import com.epam.taxi.entity.Vehicle;
+import com.epam.taxi.entity.VehicleSignal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -11,13 +11,13 @@ public class VehicleOutputProducer {
 
     private static final Logger LOG = LoggerFactory.getLogger(VehicleOutputProducer.class.getName());
 
-    private final KafkaTemplate<String, Vehicle> kafkaTemplate;
+    private final KafkaTemplate<String, VehicleSignal> kafkaTemplate;
 
-    public VehicleOutputProducer(KafkaTemplate<String, Vehicle> kafkaTemplate) {
+    public VehicleOutputProducer(KafkaTemplate<String, VehicleSignal> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void send(String topic, Vehicle vehicle) {
+    public void send(String topic, VehicleSignal vehicle) {
         kafkaTemplate.send(topic, vehicle.getId(), vehicle);
         LOG.info("Producer sent distance {} m of vehicle with id {} to TOPIC {}", vehicle.getDistance(), vehicle.getId(), topic);
     }
